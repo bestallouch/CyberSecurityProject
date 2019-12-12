@@ -22,11 +22,11 @@ def Main():
     print("Connected to Bob.\n")
 
     ## Set up initial game parameters
-    num_cards = random.randrange(10, 53, 2)
-    alice_key = 1
+    num_cards = 52
+    alice_key = random.randint(1,52)
 
-    ## Deck has even number of cards from 10 to 52
-    deck = random.sample(range(1, 53), num_cards)
+    ## Deck has numbers from 0 to 51
+    deck = list(range(num_cards))
     print("A deck of ", num_cards, " cards received.")
 
     ## Deck encryption by Alice
@@ -75,16 +75,16 @@ def Main():
     alice_cards_keys1 = []
     bob_cards_keys2 = []
 
-    ## Alice gets even indexed cards
-    for i in range(0, num_cards, 2):
+    ## Alice gets first two cards
+    for i in range(2):
         alice_cards.append(shuffled_encrypted_cards[i])
         alice_cards_keys1.append(alice_individual_keys[i])
     
-    ## Bob gets odd indexed cards
-    for i in range(1, num_cards, 2):
+    ## Bob gets second two cards
+    for i in range(2,4):
         bob_cards_keys2.append(alice_individual_keys[i])
 
-    print("A hand of ",num_cards//2," cards received.\n")
+    print("A hand of ", 2," cards received.\n")
     
     ## We need individual keys of both players for total decryption
     print("Sending individual keys of Bob's cards...\n")
@@ -98,8 +98,8 @@ def Main():
 
     ## Decrypt to see the hand you are dealt
     print("Decrypting your cards...\n")
-    alice_cards_decrypted = [ 0 for i in range(num_cards // 2) ]
-    for i in range(num_cards//2):
+    alice_cards_decrypted = [ 0 for i in range(2) ]
+    for i in range(2):
         alice_cards_decrypted[i] = decryptCard(decryptCard(alice_cards[i], alice_cards_keys1[i]), alice_cards_keys2[i])
 
     print("Your cards are : ")

@@ -16,7 +16,6 @@ def sendDeck(connection, address, deck):
     data = pickle.dumps(deck, -1)
     connection.sendall(data)
 
-
 ## Set up server for messages
 def setServer(host, port, num_connections):
     server = socket.socket()

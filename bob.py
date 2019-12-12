@@ -15,11 +15,11 @@ def Main():
 
     print("Connected to Alice.\n")
 
-    shuffled_deck_alice = client_alice.recv(4096)
+    shuffled_deck_alice = client_alice.recv(1024)
     shuffled_deck_alice = pickle.loads(shuffled_deck_alice)
 
     num_cards = len(shuffled_deck_alice)
-    bob_key = 2
+    bob_key = random.randint(1,52)
     print("A deck of ",num_cards," cards received from Alice.")
 
     ## Deck encryption by bob
@@ -35,7 +35,7 @@ def Main():
     client_alice.sendall(shuffled_deck_bob)
     print("Deck sent back to Alice.\n")
 
-    shuffled_deck_bob = client_alice.recv(4096)
+    shuffled_deck_bob = client_alice.recv(1024)
     shuffled_deck_bob = pickle.loads(shuffled_deck_bob)
     print("Deck received from Alice.")
 
@@ -65,14 +65,14 @@ def Main():
     bob_cards_keys1 = []
     alice_cards_keys2 = []
 
-    for i in range(1,num_cards,2):
+    for i in range(2,4):
         bob_cards.append(shuffled_deck_bob[i])
         bob_cards_keys1.append(bob_individual_keys[i])
     
-    for i in range(0,num_cards,2):
+    for i in range(2):
         alice_cards_keys2.append(bob_individual_keys[i])
 
-    print("A hand of ",num_cards//2," cards received.\n")
+    print("A hand of ",2," cards received.\n")
     print("Individual keys received.\n")
     print("Sending individual keys of Alice's cards...\n")
 
@@ -81,8 +81,8 @@ def Main():
     print('Sent.\n')
 
     print("Decrypting your cards...\n")
-    bob_cards_decrypted = [0 for i in range(num_cards//2)]
-    for i in range(num_cards//2):
+    bob_cards_decrypted = [0 for i in range(2)]
+    for i in range(2):
         bob_cards_decrypted[i] = decryptCard(decryptCard(bob_cards[i],bob_cards_keys1[i]),bob_cards_keys2[i])
 
     print("Your cards are : ")
