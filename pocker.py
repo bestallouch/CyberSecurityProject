@@ -103,7 +103,7 @@ def check_two_pairs(hand):
 
         for key in value_counts:
             if value_counts[key] == 2:
-                if key != pair1:
+                if pair1 == 0:
                     pair1 = key
                 else:
                     pair2 = key
@@ -125,7 +125,7 @@ def check_one_pair(hand):
                 ans = key
 
         cards = [card for card in hand if common.get_hand_values([card])[0] == ans]
-        return True, [cards], [ans], 3
+        return True, cards, [ans], 3
     return False, [], [], 3
 
 
@@ -229,8 +229,8 @@ def choose_winner(left_hand, right_hand, table_cards):
 
 if __name__ == '__main__':
     left_hand = [10, 39]
-    right_hand = [34, 51]
-    table = [23, 47, 48, 49, 46]
+    right_hand = [33, 51]
+    table = [23, 47, 48, 34, 32]
     common.print_cards_in_lst(left_hand)
     common.print_cards_in_lst(right_hand)
     common.print_cards_in_lst(table)
