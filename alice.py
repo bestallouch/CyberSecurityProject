@@ -224,7 +224,6 @@ def main():
                     print("Waiting for your opponent")
                     command = connection_from_bob.recv(4096)
                     command = pickle.loads(command)
-                    print("Opponent made a bet")
 
                     if "fold" in command:
                         alice_money += bank
@@ -237,16 +236,16 @@ def main():
                         bob_money -= bob_bet
                         all_bob_bet += bob_bet
                         bank += bob_bet
-                        print("Opponent raise on", bob_bet)
+                        print("Opponent RAISED on", bob_bet)
                     if "call" in command:
                         bob_bet = all_alice_bet - all_bob_bet
                         bob_money -= bob_bet
                         all_bob_bet += bob_bet
                         bank += bob_bet
-                        print("Opponent call on", bob_bet)
+                        print("Opponent CALLED on", bob_bet)
                         break
                     if "check" in command:
-                        print("Opponent check")
+                        print("Opponent CHECKED")
                     print("Opponent: stack -", bob_money, ",", "pot -", bank, "opponent total bet -", all_bob_bet)
 
             if current_card_in_deck < 9 and not isFold:
@@ -260,7 +259,7 @@ def main():
                 table_cards.append(
                     decrypt_card(decrypt_card(shuffled_encrypted_cards[current_card_in_deck], key_from_bob),
                                  key_from_alice))
-                print("Board are:")
+                print("Board is:")
                 print_cards_in_lst(table_cards)
                 print("\n")
             current_card_in_deck += 1
