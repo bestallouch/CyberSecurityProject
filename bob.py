@@ -137,7 +137,7 @@ def main():
             table_cards.append(
                 decrypt_card(decrypt_card(table_cards_encrypted[i], table_cards_keys1[i]), table_cards_keys2[i]))
 
-        print("Table are:")
+        print("Board is:")
         print()
         print_cards_in_lst(table_cards)
         print("\n")
@@ -247,7 +247,7 @@ def main():
                 key_from_alice = pickle.loads(key_from_alice)
 
                 table_cards.append(decrypt_card(decrypt_card(shuffled_encrypted_cards[current_card_in_deck], key_from_bob), key_from_alice))
-                print("Table are:")
+                print("Board is:")
                 print_cards_in_lst(table_cards)
                 print("\n")
             current_card_in_deck += 1
@@ -264,7 +264,7 @@ def main():
             for i in range(2):
                 alice_cards.append(decrypt_card(decrypt_card(shuffled_encrypted_cards[i], bob_individual_keys[i]), alice_cards_keys[i]))
 
-            print("Table are:")
+            print("Board is:")
             print_cards_in_lst(table_cards)
 
             print("Your cards are:")
@@ -273,6 +273,23 @@ def main():
             print("Opponent cards are:")
             print_cards_in_lst(alice_cards)
             result = choose_winner(alice_cards, bob_cards_decrypted, table_cards)
+
+            if result[0]:
+                print("Opponent won!")
+                alice_money += bank
+
+            else:
+                if result[1]:
+                    print("You won!")
+                    bob_money += bank
+                else:
+                    print("Split!")
+                    bob_money += bank/2
+                    alice_money += bank/2
+            bank = 0
+            all_bob_bet = 0
+            all_alice_bet = 0
+
             print("Result =", result)
 
         print("To exit enter \"exit\"")

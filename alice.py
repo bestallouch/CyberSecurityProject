@@ -14,7 +14,7 @@ from pocker import *
 def main():
     # Alice's server for initial reshuffling
     # Set up server to connect to Bob
-    server_alice = set_server(input(), 5006, 2)
+    server_alice = set_server('0.0.0.0', 5006, 2)
 
     print("Alice is up for the game.")
     print("Waiting for Bob to connect...\n")
@@ -155,7 +155,7 @@ def main():
             table_cards.append(
                 decrypt_card(decrypt_card(table_cards_encrypted[i], table_cards_keys1[i]), table_cards_keys2[i]))
 
-        print("Table are:")
+        print("Board is:")
         print_cards_in_lst(table_cards)
         print("\n")
 
@@ -176,13 +176,14 @@ def main():
 
         current_card_in_deck = 7
         isFold = False
+        is_call = False
         # Time to make a bet
         while current_card_in_deck < 10 and not isFold:
             first_turn = True
             while (all_alice_bet != all_bob_bet or first_turn) and not isFold:
                 first_turn = False
                 print("Time to make a bet. Enter help for more information")
-                print("You: stack -", alice_money, ",", "pot -", bank, "your total bet -", all_alice_bet)
+                print("You: stack -", alice_money, ",", "pot -", bank, ",", "your total bet -", all_alice_bet)
                 while True:
                     command = input()
                     print("\n")
@@ -214,10 +215,11 @@ def main():
                             alice_money -= alice_bet
                             all_alice_bet += alice_bet
                             bank += alice_bet
+                            is_call = True
                             send_deck(connection_from_bob, address_bob, command)
                             break
 
-                if not isFold:
+                if not isFold and not is_call:
                     # Get Bob bet
                     print("Waiting for your opponent")
                     command = connection_from_bob.recv(4096)
@@ -257,7 +259,7 @@ def main():
                 table_cards.append(
                     decrypt_card(decrypt_card(shuffled_encrypted_cards[current_card_in_deck], key_from_bob),
                                  key_from_alice))
-                print("Table are:")
+                print("Board are:")
                 print_cards_in_lst(table_cards)
                 print("\n")
             current_card_in_deck += 1
@@ -274,7 +276,7 @@ def main():
                     decrypt_card(decrypt_card(shuffled_encrypted_cards[i + 2], alice_individual_keys[i + 2]),
                                  bob_cards_keys[i]))
 
-            print("Table are:")
+            print("Board is:")
             print_cards_in_lst(table_cards)
 
             print("Your cards are:")
@@ -283,6 +285,23 @@ def main():
             print("Opponent cards are:")
             print_cards_in_lst(bob_cards)
             result = choose_winner(alice_cards_decrypted, bob_cards, table_cards)
+
+            if result[0]:
+                print("You won!")
+                alice_money += bank
+
+            else:
+                if result[1]:
+                    print("Opponent won!")
+                    bob_money += bank
+                else:
+                    print("Split!")
+                    bob_money += bank / 2
+                    alice_money += bank / 2
+            bank = 0
+            all_bob_bet = 0
+            all_alice_bet = 0
+
             print("Result =", result)
 
         print("To exit enter \"exit\"")
