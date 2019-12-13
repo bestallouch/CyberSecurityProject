@@ -152,7 +152,7 @@ def main():
         all_alice_bet += alice_bet
         bank += alice_bet
 
-        bob_bet = 2 * alice_bet
+        bob_bet = alice_bet
         print("You are the 2 player. Your bet is ", bob_bet, "\n")
 
         bob_money -= bob_bet

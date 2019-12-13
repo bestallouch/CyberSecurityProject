@@ -163,6 +163,7 @@ def main():
         alice_bet = 50
         alice_money -= alice_bet
         all_alice_bet += alice_bet
+        bank += alice_bet
         print("You are the 1 player. Your bet is", alice_bet, "\n")
         print("You have ", alice_money, "$")
 
