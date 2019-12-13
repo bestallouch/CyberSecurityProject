@@ -183,7 +183,7 @@ def main():
             is_call = False
             isFold = False
             while (all_alice_bet != all_bob_bet or first_turn) and not isFold:
-                first_turn = False
+
                 print("Time to make a bet. Enter help for more information")
                 print("You: stack -", alice_money, ",", "pot -", bank, ",", "your total bet -", all_alice_bet)
                 while True:
@@ -212,14 +212,16 @@ def main():
                             bank += alice_bet
                             send_deck(connection_from_bob, address_bob, command)
                             break
-                        if command == "call":
+                        if "call" in command:
                             alice_bet = all_bob_bet - all_alice_bet
                             alice_money -= alice_bet
                             all_alice_bet += alice_bet
                             bank += alice_bet
-                            is_call = True
+                            if not first_turn:
+                                is_call = True
                             send_deck(connection_from_bob, address_bob, command)
                             break
+                first_turn = False
 
                 if not first_turn and not is_call:
                     if not isFold:
@@ -298,10 +300,14 @@ def main():
                 if result[1]:
                     print("Opponent won!")
                     bob_money += bank
+
                 else:
                     print("Split!")
                     bob_money += bank / 2
                     alice_money += bank / 2
+
+            print("Opponent money", bob_money)
+            print("Your money", alice_money)
             bank = 0
             all_bob_bet = 0
             all_alice_bet = 0

@@ -302,6 +302,8 @@ def main():
             bank = 0
             all_bob_bet = 0
             all_alice_bet = 0
+            print("Opponent money", alice_money)
+            print("Your money", bob_money)
 
             print("Result =", result)
 
