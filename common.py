@@ -63,7 +63,7 @@ def send_key(connection, key):
 
 
 def get_card_by_num(card_num: int):
-    return values_dct[(card_num - 2) // 4 + 2], (all_suits[card_num % 4]).decode("utf-8")
+    return values_dct[(card_num - 2) // 4 + 2], (all_suits[(card_num - 2) % 4]).decode("utf-8")
 
 
 def print_cards_in_lst(card_lst):
