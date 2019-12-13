@@ -2,6 +2,7 @@ import socket
 import pickle
 import random
 import time
+import gmpy2
 from common import *
 
 
@@ -20,13 +21,15 @@ def main():
     shuffled_deck_alice = pickle.loads(shuffled_deck_alice)
 
     num_cards = len(shuffled_deck_alice)
-    bob_key = random.randint(1, 52)
+    state = gmpy2.random_state(456)
+    c, b = generate_keys(PRIME, state)
+    print("c, b", c, b)
     print("A deck of ", num_cards, " cards received from Alice.")
 
     # Deck encryption by bob
     deck_bob = list()
     for i in range(num_cards):
-        deck_bob.append(encrypt_card(shuffled_deck_alice[i], bob_key))
+        deck_bob.append(encrypt_card(shuffled_deck_alice[i], c))
 
     # Shuffle
     random.shuffle(deck_bob)
@@ -38,17 +41,22 @@ def main():
 
     shuffled_deck_bob = client_alice.recv(1024)
     shuffled_deck_bob = pickle.loads(shuffled_deck_bob)
+    print ("shuffled_deck_bob", shuffled_deck_bob)
     print("Deck received from Alice.")
 
     for i in range(num_cards):
-        shuffled_deck_bob[i] = decrypt_card(shuffled_deck_bob[i], bob_key)
+        shuffled_deck_bob[i] = decrypt_card(shuffled_deck_bob[i], b)
 
     print("Deck decrypted.\n")
-
+    bob_individual_keys_c = [0] * num_cards
+    bob_individual_keys_b = [0] * num_cards
     print("Getting individual keys...")
-    bob_individual_keys = random.sample(range(1, 60), num_cards)
+
     for i in range(num_cards):
-        shuffled_deck_bob[i] = encrypt_card(shuffled_deck_bob[i], bob_individual_keys[i])
+        bob_individual_keys_c[i], bob_individual_keys_b[i] = generate_keys(PRIME, state)
+
+    for i in range(num_cards):
+        shuffled_deck_bob[i] = encrypt_card(shuffled_deck_bob[i], bob_individual_keys_c[i])
     print("Deck encrypted by individual keys.\n")
 
     data = pickle.dumps(shuffled_deck_bob, -1)
@@ -67,10 +75,10 @@ def main():
 
     for i in range(2, 4):
         bob_cards.append(shuffled_deck_bob[i])
-        bob_cards_keys1.append(bob_individual_keys[i])
+        bob_cards_keys1.append(bob_individual_keys_b[i])
 
     for i in range(2):
-        alice_cards_keys2.append(bob_individual_keys[i])
+        alice_cards_keys2.append(bob_individual_keys_b[i])
 
     print("A hand of ", 2, " cards received.\n")
     print("Individual keys received.\n")

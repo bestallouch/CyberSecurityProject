@@ -2,6 +2,8 @@ import socket
 import pickle
 import itertools
 from pocker import check_hand
+from collections import defaultdict
+import gmpy2
 
 all_suits = [u"\u2660".encode('utf-8'),  # spades
              u"\u2764".encode('utf-8'),  # hearts
@@ -14,15 +16,24 @@ values_dct = {2: "2", 3: "3", 4: "4", 5: "5", 6: "6", 7: "7", 8: "8", 9: "9", 10
 hand_dct = {9: "straight-flush", 8: "four-of-a-kind", 7: "full-house", 6: "flush", 5: "straight", 4: "three-of-a-kind",
             3: "two-pairs", 2: "one-pair", 1: "highest-card"}
 
+PRIME = 4294967291
 
-# A commutative encryption function
+
+def generate_keys(prime, state):
+    while True:
+        e = gmpy2.mpz_random(state, prime - 2)
+        if gmpy2.gcd(e, prime - 1) == 1 and e > 2:
+            break
+    d = gmpy2.invert(e, prime - 1)
+    return e, d
+
+
 def encrypt_card(val, key):
-    return val ^ key
+    return int(gmpy2.powmod(val, key, PRIME).digits())
 
 
-# Complementary decryption function
 def decrypt_card(val, key):
-    return val ^ key
+    return int(gmpy2.powmod(val, key, PRIME).digits())
 
 
 # Send Deck to connection
