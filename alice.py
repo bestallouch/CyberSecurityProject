@@ -33,7 +33,7 @@ def main():
     for i in range(num_cards):
         deck[i] = encryptCard(deck[i], alice_key)
 
-    # Shuffle deck    
+    # Shuffle deck
     random.shuffle(deck)
     print("Deck encrypted and shuffled.\n")
 
@@ -108,35 +108,90 @@ def main():
     print("\n")
 
     print("We can start the game now..")
-    print("Connecting to the servers...")
+    while True:
+        print("Enter \"yes\" if you are ready:")
+        if input() == "yes":
+            break
 
-    # Connect to Server 1
-    client_sock1 = connectToServer('127.0.0.1', 5004)
+    print("Starting the game...")
 
-    packet = client_sock1.recv(4096)
-    dicti = pickle.loads(packet)
-    rand_no = dicti["rand_no"]
-    public_key = dicti["public_key"]
+    # Send table cards to Bob
+    table_cards_keys1 = []
+    table_cards_encrypted = []
+    for i in range(4,7):
+        table_cards_keys1.append(alice_individual_keys[i])
+        table_cards_encrypted.append(shuffled_encrypted_cards[i])
 
-    # Connect to Server 2
-    client_sock2 = connectToServer('127.0.0.1', 5005)
+    sendDeck(connection_from_bob, address_bob, table_cards_keys1)
 
-    print("Connected.\n")
-    print("Alice! Throw your cards.\n")
-    print("Enter the card index.")
 
-    # Send you cards based on indexing
-    for i in range(5):
-        ind = int(input())
-        encrypted_card = public_key.encrypt(alice_cards_decrypted[ind - 1] * rand_no)
-        data = pickle.dumps(encrypted_card, -1)
-        client_sock2.sendall(data)
-        result = client_sock1.recv(1024).decode('ascii')
-        print(result)
+    # Receive table cards from Bob
+    table_cards_keys2 = connection_from_bob.recv(4096)
+    table_cards_keys2 = pickle.loads(table_cards_keys2)
+
+     # Decrypt table cards
+    table_cards = []
+    for i in range(3):
+        table_cards.append(decryptCard(decryptCard(table_cards_encrypted[i], table_cards_keys1[i]), table_cards_keys2[i]))
+
+    print("Table are:")
+    print_cards_in_lst(table_cards)
+    print("\n")
+
+    # Money
+    alice_money = 1000
+    bob_money = 1000
+    bank = 0
+
+    # Time to make a bet
+    print("You are the 1 player. Your bet is 50\n")
+
+    alice_bet = 50
+    alice_money -= alice_bet
+
+    print("You have ", alice_money, "$")
+
+    sendDeck(connection_from_bob, address_bob, alice_bet)
+    bob_bet = connection_from_bob.recv(4096)
+    bob_bet = pickle.loads(bob_bet)
+
+    bob_money -= bob_bet
+    bank += bob_bet
+
+    # Time to make a second bet
+    print("Time to make a second bet. Enter help for more information")
+    while True:
+        command = input()
+        print("\n")
+        if command == "help":
+            print("To fold enter \"f\" ")
+            print("To check enter \" ch \"")
+            print("To raise enter \"r x\", where x is your bet")
+            print("To call enter \"call\"\n")
+        else:
+            if command == "f":
+                bob_money += bank
+                bank = 0
+                sendDeck(connection_from_bob, address_bob, command)
+                print("You lose. You have", alice_money, "$")
+                break
+            if command == "ch":
+                sendDeck(connection_from_bob, address_bob, command)
+                break
+            if command[0] == "r":
+                alice_bet = int(command[2:])
+                alice_money -= alice_bet
+                bank += alice_bet
+                sendDeck(connection_from_bob, address_bob, command)
+                break
+            if command == "call":
+                alice_bet = bob_bet - alice_bet
+                alice_money -= alice_bet
+                bank += alice_bet
+                sendDeck(connection_from_bob, address_bob, command)
+                break
 
     # Close all connections
-    client_sock2.close()
-    client_sock1.close()
     connection_from_bob.close()
     server_alice.close()
 
