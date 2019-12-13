@@ -196,6 +196,7 @@ def main():
                         if command == "fold":
                             bob_money += bank
                             bank = 0
+
                             send_deck(connection_from_bob, address_bob, command)
                             print("You lose. You have", alice_money, "$")
                             isFold = True
@@ -203,16 +204,19 @@ def main():
                         if command == "check":
                             send_deck(connection_from_bob, address_bob, command)
                             break
+
                         if "raise" in command:
                             alice_bet = int(command.strip().split()[1])
                             alice_money -= alice_bet
                             all_alice_bet += alice_bet
                             bank += alice_bet
+
                             send_deck(connection_from_bob, address_bob, command)
                             break
                         if command == "call":
                             alice_bet = all_bob_bet - all_alice_bet
                             alice_money -= alice_bet
+
                             all_alice_bet += alice_bet
                             bank += alice_bet
                             is_call = True
@@ -234,6 +238,7 @@ def main():
                     if "raise" in command:
                         bob_bet = int(command.split()[1])
                         bob_money -= bob_bet
+
                         all_bob_bet += bob_bet
                         bank += bob_bet
                         print("Opponent RAISED on", bob_bet)

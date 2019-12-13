@@ -180,13 +180,15 @@ def main():
                     break
                 if "raise" in command:
                     alice_bet = int(command.split()[1])
-                    all_alice_bet += alice_bet
                     alice_money -= alice_bet
+
+                    all_alice_bet += alice_bet
                     bank += alice_bet
                     print("Opponent RAISED on", alice_bet)
                 if "call" in command:
                     alice_bet = all_bob_bet - all_alice_bet
                     alice_money -= alice_bet
+
                     all_alice_bet += alice_bet
                     bank += alice_bet
                     print("Opponent CALLED on", alice_bet)
@@ -222,6 +224,7 @@ def main():
                             if "raise" in command:
                                 bob_bet = int(command.split()[1])
                                 bob_money -= bob_bet
+
                                 all_bob_bet += bob_bet
                                 bank += bob_bet
                                 data = pickle.dumps(command, -1)
@@ -230,6 +233,7 @@ def main():
                             if "call" in command:
                                 bob_bet = all_alice_bet - all_bob_bet
                                 bob_money -= bob_bet
+
                                 all_bob_bet += bob_bet
                                 bank += bob_bet
                                 data = pickle.dumps(command, -1)

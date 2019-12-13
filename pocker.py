@@ -2,14 +2,17 @@ from collections import defaultdict
 import common
 import itertools
 
+values_dct = {2: "2", 3: "3", 4: "4", 5: "5", 6: "6", 7: "7", 8: "8", 9: "9", 10: "10", 11: "J", 12: "Q", 13: "K",
+              14: "A"}
+
 
 def check_straight_flush(hand):
     values = common.get_hand_values(hand)
 
     if check_flush(hand)[0] and check_straight(hand)[0]:
-        return True, [max(values)], 0
+        return True, hand, [max(values)], 0
 
-    return False, [], 0
+    return False, [], [], 0
 
 
 def check_four_of_a_kind(hand):
@@ -18,13 +21,14 @@ def check_four_of_a_kind(hand):
     for v in values:
         value_counts[v] += 1
 
-    if sorted(value_counts.values()) == (1, 4):
+    if sorted(value_counts.values()) == [1, 4]:
         for key in value_counts:
             if value_counts[key] == 4:
                 ans = key
 
-        return True, [ans], 1
-    return False, [], 1
+        cards = [card for card in hand if common.get_hand_values([card])[0] == ans]
+        return True, cards, [ans], 1
+    return False, [], [], 1
 
 
 def check_full_house(hand):
@@ -33,7 +37,7 @@ def check_full_house(hand):
     for v in values:
         value_counts[v] += 1
 
-    if sorted(value_counts.values()) == (2, 3):
+    if sorted(value_counts.values()) == [2, 3]:
         ans = [0, 0]
         for key in value_counts:
             if value_counts[key] == 3:
@@ -41,16 +45,16 @@ def check_full_house(hand):
             elif value_counts[key] == 2:
                 ans[1] = key
 
-        return True, ans, 0
-    return False, [], 0
+        return True, hand, ans, 0
+    return False, [], [], 0
 
 
 def check_flush(hand):
     suits = common.get_hand_suits(hand)
     if len(set(suits)) == 1:
-        return True, sorted(common.get_hand_values(hand), reverse=True), 0
+        return True, hand, sorted(common.get_hand_values(hand), reverse=True), 0
 
-    return False, [], 0
+    return False, [], [], 0
 
 
 def check_straight(hand):
@@ -61,13 +65,13 @@ def check_straight(hand):
 
     value_range = max(values) - min(values)
     if value_range == 4 and len(set(value_counts.values())) == 1:
-        return True, [max(values)], 0
+        return True, hand, [max(values)], 0
 
     # check straight with low Ace
     if set(values) == {14, 2, 3, 4, 5}:
-        return True, [5], 0
+        return True, hand, [5], 0
 
-    return False, [], 0
+    return False, [], [], 0
 
 
 def check_three_of_a_kind(hand):
@@ -81,9 +85,10 @@ def check_three_of_a_kind(hand):
             if value_counts[key] == 3:
                 ans = key
 
-        return True, [ans], 2
+        cards = [card for card in hand if common.get_hand_values([card])[0] == ans]
+        return True, cards, [ans], 2
 
-    return False, [], 2
+    return False, [], [], 2
 
 
 def check_two_pairs(hand):
@@ -103,8 +108,9 @@ def check_two_pairs(hand):
                 else:
                     pair2 = key
 
-        return True, sorted([pair1, pair2], reverse=True), 1
-    return False, [], 1
+        cards = [card for card in hand if common.get_hand_values([card])[0] in [pair1, pair2]]
+        return True, cards, sorted([pair1, pair2], reverse=True), 1
+    return False, [], [], 1
 
 
 def check_one_pair(hand):
@@ -118,81 +124,88 @@ def check_one_pair(hand):
             if value_counts[key] == 2:
                 ans = key
 
-        return True, [ans], 3
-    return False, [], 3
+        cards = [card for card in hand if common.get_hand_values([card])[0] == ans]
+        return True, [cards], [ans], 3
+    return False, [], [], 3
 
 
 def check_hand(hand):
-    flag, ans, kickers_amount = check_straight_flush(hand)
+    flag, cards, ans, kickers_amount = check_straight_flush(hand)
     if flag:
-        return 9, ans, kickers_amount
+        return 9, cards, ans, kickers_amount
 
-    flag, ans, kickers_amount = check_four_of_a_kind(hand)
+    flag, cards, ans, kickers_amount = check_four_of_a_kind(hand)
     if flag:
-        return 8, ans, kickers_amount
+        return 8, cards, ans, kickers_amount
 
-    flag, ans, kickers_amount = check_full_house(hand)
+    flag, cards, ans, kickers_amount = check_full_house(hand)
     if flag:
-        return 7, ans, kickers_amount
+        return 7, cards, ans, kickers_amount
 
-    flag, ans, kickers_amount = check_flush(hand)
+    flag, cards, ans, kickers_amount = check_flush(hand)
     if flag:
-        return 6, ans, kickers_amount
+        return 6, cards, ans, kickers_amount
 
-    flag, ans, kickers_amount = check_straight(hand)
+    flag, cards, ans, kickers_amount = check_straight(hand)
     if flag:
-        return 5, ans, kickers_amount
+        return 5, cards, ans, kickers_amount
 
-    flag, ans, kickers_amount = check_three_of_a_kind(hand)
+    flag, cards, ans, kickers_amount = check_three_of_a_kind(hand)
     if flag:
-        return 4, ans, kickers_amount
+        return 4, cards, ans, kickers_amount
 
-    flag, ans, kickers_amount = check_two_pairs(hand)
+    flag, cards, ans, kickers_amount = check_two_pairs(hand)
     if flag:
-        return 3, ans, kickers_amount
+        return 3, cards, ans, kickers_amount
 
-    flag, ans, kickers_amount = check_one_pair(hand)
+    flag, cards, ans, kickers_amount = check_one_pair(hand)
     if flag:
-        return 2, ans, kickers_amount
+        return 2, cards, ans, kickers_amount
 
-    return 1, [], kickers_amount
+    return 1, [], [], 5
 
 
 def get_hand_score(hand, table_cards):
     combinations = itertools.combinations(hand + table_cards, 5)
     score = 0
+    cards = []
     ans = []
     kickers_amount = 0
 
     for combination in combinations:
-        curr_score, ans_curr, kickers_amount_curr = check_hand(combination)
+        curr_score, cards_curr, ans_curr, kickers_amount_curr = check_hand(combination)
         if curr_score > score:
             score = curr_score
             ans = ans_curr
+            cards = cards_curr
             kickers_amount = kickers_amount_curr
 
     kickers = []
     for card in hand + table_cards:
-        if card not in ans:
+        if card not in cards:
             kickers.append(card)
 
     kickers = sorted(kickers, reverse=True)[:kickers_amount]
-    return score, ans, kickers
+    return score, cards, ans, kickers
 
 
 def choose_winner(left_hand, right_hand, table_cards):
-    left_score, left_ans, left_kickers = get_hand_score(left_hand, table_cards)
-    right_score, right_ans, right_kickers = get_hand_score(right_hand, table_cards)
+    left_score, left_cards, left_ans, left_kickers = get_hand_score(left_hand, table_cards)
+    right_score, right_cards, right_ans, right_kickers = get_hand_score(right_hand, table_cards)
 
     combination_lst = ["no combination", "one pair", "two pairs", "three of a kind", "straight", "flush", "full house",
                        "four of a kind",
                        "straight flush"]
 
-    print(
-        f"Left guy has combination '{combination_lst[left_score - 1]}' with main card values: {left_ans} and kickers {left_kickers}\n")
+    print(f"Left guy has combination '{combination_lst[left_score - 1]}' with main card values:")
+    common.print_cards_in_lst(left_cards)
+    print("and kickers")
+    common.print_cards_in_lst(left_kickers)
 
-    print(
-        f"Right guy has combination '{combination_lst[right_score - 1]}' with main card values: {right_ans} and kickers {right_kickers}\n")
+    print(f"Right guy has combination '{combination_lst[right_score - 1]}' with main card values:")
+    common.print_cards_in_lst(right_cards)
+    print("and kickers")
+    common.print_cards_in_lst(right_kickers)
 
     if left_score > right_score:
         return 1, 0
@@ -215,9 +228,9 @@ def choose_winner(left_hand, right_hand, table_cards):
 
 
 if __name__ == '__main__':
-    left_hand = [53, 49]
-    right_hand = [26, 50]
-    table = [16, 20, 32, 40, 21]
+    left_hand = [10, 39]
+    right_hand = [34, 51]
+    table = [23, 47, 48, 49, 46]
     common.print_cards_in_lst(left_hand)
     common.print_cards_in_lst(right_hand)
     common.print_cards_in_lst(table)
