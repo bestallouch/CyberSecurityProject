@@ -204,7 +204,7 @@ def main():
                             send_deck(connection_from_bob, address_bob, command)
                             break
                         if "raise" in command:
-                            alice_bet = int(command.split()[1])
+                            alice_bet = int(command.strip().split()[1])
                             alice_money -= alice_bet
                             all_alice_bet += alice_bet
                             bank += alice_bet
