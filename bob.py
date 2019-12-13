@@ -137,10 +137,10 @@ def main():
             table_cards.append(
                 decrypt_card(decrypt_card(table_cards_encrypted[i], table_cards_keys1[i]), table_cards_keys2[i]))
 
-        print("Board is:")
-        print()
-        print_cards_in_lst(table_cards)
-        print("\n")
+        # print("Board is:")
+        # print()
+        # print_cards_in_lst(table_cards)
+        # print("\n")
 
 
 
@@ -169,6 +169,9 @@ def main():
         isFold = False
         first_turn = True
         is_call = False
+        show_deck = True
+
+
         while current_card_in_deck < 10 and not isFold:
 
             while (all_alice_bet != all_bob_bet or first_turn) and not isFold:
@@ -248,21 +251,31 @@ def main():
 
 
             if current_card_in_deck < 9 and not isFold:
-                # Open one more card
                 isFold = False
                 first_turn = True
                 is_call = False
-                key_from_bob = bob_individual_keys[current_card_in_deck]
-                data = pickle.dumps(key_from_bob, -1)
-                client_alice.sendall(data)
 
-                key_from_alice = client_alice.recv(4096)
-                key_from_alice = pickle.loads(key_from_alice)
+                if show_deck:
+                    print("Board is:")
+                    print()
+                    print_cards_in_lst(table_cards)
+                    print("\n")
 
-                table_cards.append(decrypt_card(decrypt_card(shuffled_encrypted_cards[current_card_in_deck], key_from_bob), key_from_alice))
-                print("Board is:")
-                print_cards_in_lst(table_cards)
-                print("\n")
+                    show_deck=False
+                    current_card_in_deck = 2
+                else:
+                    # Open one more card
+                    key_from_bob = bob_individual_keys[current_card_in_deck]
+                    data = pickle.dumps(key_from_bob, -1)
+                    client_alice.sendall(data)
+
+                    key_from_alice = client_alice.recv(4096)
+                    key_from_alice = pickle.loads(key_from_alice)
+
+                    table_cards.append(decrypt_card(decrypt_card(shuffled_encrypted_cards[current_card_in_deck], key_from_bob), key_from_alice))
+                    print("Board is:")
+                    print_cards_in_lst(table_cards)
+                    print("\n")
             current_card_in_deck += 1
 
         if not isFold:
