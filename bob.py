@@ -171,7 +171,6 @@ def main():
         is_call = False
         while current_card_in_deck < 10 and not isFold:
 
-
             while (all_alice_bet != all_bob_bet or first_turn) and not isFold:
                 # Get Alice bet
                 print("Wait for your opponent")
@@ -196,7 +195,8 @@ def main():
 
                     all_alice_bet += alice_bet
                     bank += alice_bet
-                    is_call = True
+                    if not first_turn:
+                        is_call = True
                     print("Opponent CALLED on", alice_bet)
                 if "check" in command:
                     print("Opponent CHECK")
