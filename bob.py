@@ -166,10 +166,12 @@ def main():
 
         data = pickle.dumps(bob_bet, -1)
         client_alice.sendall(data)
+        isFold = False
+        first_turn = True
+        is_call = False
         while current_card_in_deck < 10 and not isFold:
-            first_turn = True
-            isFold = False
-            is_call = False
+
+
             while (all_alice_bet != all_bob_bet or first_turn) and not isFold:
                 # Get Alice bet
                 print("Wait for your opponent")
@@ -247,6 +249,9 @@ def main():
 
             if current_card_in_deck < 9 and not isFold:
                 # Open one more card
+                isFold = False
+                first_turn = True
+                is_call = False
                 key_from_bob = bob_individual_keys[current_card_in_deck]
                 data = pickle.dumps(key_from_bob, -1)
                 client_alice.sendall(data)
