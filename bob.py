@@ -26,7 +26,7 @@ def main():
     # Deck encryption by bob
     deck_bob = list()
     for i in range(num_cards):
-        deck_bob.append(encryptCard(shuffled_deck_alice[i], bob_key))
+        deck_bob.append(encrypt_card(shuffled_deck_alice[i], bob_key))
 
     # Shuffle
     random.shuffle(deck_bob)
@@ -41,14 +41,14 @@ def main():
     print("Deck received from Alice.")
 
     for i in range(num_cards):
-        shuffled_deck_bob[i] = decryptCard(shuffled_deck_bob[i], bob_key)
+        shuffled_deck_bob[i] = decrypt_card(shuffled_deck_bob[i], bob_key)
 
     print("Deck decrypted.\n")
 
     print("Getting individual keys...")
     bob_individual_keys = random.sample(range(1, 60), num_cards)
     for i in range(num_cards):
-        shuffled_deck_bob[i] = encryptCard(shuffled_deck_bob[i], bob_individual_keys[i])
+        shuffled_deck_bob[i] = encrypt_card(shuffled_deck_bob[i], bob_individual_keys[i])
     print("Deck encrypted by individual keys.\n")
 
     data = pickle.dumps(shuffled_deck_bob, -1)
@@ -83,7 +83,7 @@ def main():
     print("Decrypting your cards...\n")
     bob_cards_decrypted = [0 for i in range(2)]
     for i in range(2):
-        bob_cards_decrypted[i] = decryptCard(decryptCard(bob_cards[i], bob_cards_keys1[i]), bob_cards_keys2[i])
+        bob_cards_decrypted[i] = decrypt_card(decrypt_card(bob_cards[i], bob_cards_keys1[i]), bob_cards_keys2[i])
 
     print("Your cards are : ")
     print_cards_in_lst(bob_cards_decrypted)

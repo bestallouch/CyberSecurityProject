@@ -12,7 +12,7 @@ from common import *
 def main():
     # Alice's server for initial reshuffling
     # Set up server to connect to Bob
-    server_alice = setServer('127.0.0.1', 5006, 2)
+    server_alice = set_server('127.0.0.1', 5006, 2)
 
     print("Alice is up for the game.")
     print("Waiting for Bob to connect...\n")
@@ -31,14 +31,14 @@ def main():
 
     # Deck encryption by Alice
     for i in range(num_cards):
-        deck[i] = encryptCard(deck[i], alice_key)
+        deck[i] = encrypt_card(deck[i], alice_key)
 
     # Shuffle deck
     random.shuffle(deck)
     print("Deck encrypted and shuffled.\n")
 
     # Send deck to Bob
-    sendDeck(connection_from_bob, address_bob, deck)
+    send_deck(connection_from_bob, address_bob, deck)
     print("Deck sent to Bob.\n")
 
     # Receive encrypted and shuffled deck from Bob
@@ -48,7 +48,7 @@ def main():
 
     # Decrypt deck before individual encryption
     for i in range(num_cards):
-        shuffled_deck_bob[i] = decryptCard(shuffled_deck_bob[i], alice_key)
+        shuffled_deck_bob[i] = decrypt_card(shuffled_deck_bob[i], alice_key)
 
     print("Deck decrypted.\n")
 
@@ -56,11 +56,11 @@ def main():
     alice_individual_keys = random.sample(range(1, 60), num_cards)
     # Encrypt each card with its individual key
     for i in range(num_cards):
-        shuffled_deck_bob[i] = encryptCard(shuffled_deck_bob[i], alice_individual_keys[i])
+        shuffled_deck_bob[i] = encrypt_card(shuffled_deck_bob[i], alice_individual_keys[i])
     print("Deck encrypted by individual keys.\n")
 
     # Send deck to Bob for individual encryption
-    sendDeck(connection_from_bob, address_bob, shuffled_deck_bob)
+    send_deck(connection_from_bob, address_bob, shuffled_deck_bob)
     print("Deck sent to Bob.\n")
 
     # Receive final deck from Bob
@@ -88,7 +88,7 @@ def main():
 
     # We need individual keys of both players for total decryption
     print("Sending individual keys of Bob's cards...\n")
-    sendDeck(connection_from_bob, address_bob, bob_cards_keys2)
+    send_deck(connection_from_bob, address_bob, bob_cards_keys2)
     print("Sent.")
 
     print("Requesting individual keys from Bob...")
@@ -100,7 +100,7 @@ def main():
     print("Decrypting your cards...\n")
     alice_cards_decrypted = [0 for i in range(2)]
     for i in range(2):
-        alice_cards_decrypted[i] = decryptCard(decryptCard(alice_cards[i], alice_cards_keys1[i]), alice_cards_keys2[i])
+        alice_cards_decrypted[i] = decrypt_card(decrypt_card(alice_cards[i], alice_cards_keys1[i]), alice_cards_keys2[i])
 
     print("Your cards are : ")
 
@@ -115,15 +115,13 @@ def main():
 
     print("Starting the game...")
 
-    # Send table cards to Bob
-    table_cards_keys1 = []
-    table_cards_encrypted = []
-    for i in range(4,7):
-        table_cards_keys1.append(alice_individual_keys[i])
-        table_cards_encrypted.append(shuffled_encrypted_cards[i])
+    # Connect to Server 1
+    client_sock1 = connect_to_server('127.0.0.1', 5004)
 
-    sendDeck(connection_from_bob, address_bob, table_cards_keys1)
+    send_deck(connection_from_bob, address_bob, table_cards_keys1)
 
+    # Connect to Server 2
+    client_sock2 = connect_to_server('127.0.0.1', 5005)
 
     # Receive table cards from Bob
     table_cards_keys2 = connection_from_bob.recv(4096)
@@ -132,7 +130,7 @@ def main():
      # Decrypt table cards
     table_cards = []
     for i in range(3):
-        table_cards.append(decryptCard(decryptCard(table_cards_encrypted[i], table_cards_keys1[i]), table_cards_keys2[i]))
+        table_cards.append(decrypt_card(decrypt_card(table_cards_encrypted[i], table_cards_keys1[i]), table_cards_keys2[i]))
 
     print("Table are:")
     print_cards_in_lst(table_cards)
@@ -151,7 +149,7 @@ def main():
 
     print("You have ", alice_money, "$")
 
-    sendDeck(connection_from_bob, address_bob, alice_bet)
+    send_deck(connection_from_bob, address_bob, alice_bet)
     bob_bet = connection_from_bob.recv(4096)
     bob_bet = pickle.loads(bob_bet)
 
@@ -172,23 +170,23 @@ def main():
             if command == "f":
                 bob_money += bank
                 bank = 0
-                sendDeck(connection_from_bob, address_bob, command)
+                send_deck(connection_from_bob, address_bob, command)
                 print("You lose. You have", alice_money, "$")
                 break
             if command == "ch":
-                sendDeck(connection_from_bob, address_bob, command)
+                send_deck(connection_from_bob, address_bob, command)
                 break
             if command[0] == "r":
                 alice_bet = int(command[2:])
                 alice_money -= alice_bet
                 bank += alice_bet
-                sendDeck(connection_from_bob, address_bob, command)
+                send_deck(connection_from_bob, address_bob, command)
                 break
             if command == "call":
                 alice_bet = bob_bet - alice_bet
                 alice_money -= alice_bet
                 bank += alice_bet
-                sendDeck(connection_from_bob, address_bob, command)
+                send_deck(connection_from_bob, address_bob, command)
                 break
 
     # Close all connections
