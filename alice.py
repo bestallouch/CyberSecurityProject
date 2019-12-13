@@ -176,6 +176,7 @@ def main():
 
         current_card_in_deck = 7
         isFold = False
+        first_turn = True
 
         # Time to make a bet
         while current_card_in_deck < 10 and not isFold:
