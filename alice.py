@@ -3,9 +3,11 @@ import pickle
 import _thread
 import time
 import random
+import gmpy2
 
 # from phe import paillier
 from common import *
+
 
 # Alice
 
@@ -22,8 +24,10 @@ def main():
     print("Connected to Bob.\n")
 
     # Set up initial game parameters
+    state = gmpy2.random_state(387)
+    e, d = generate_keys(PRIME, state)
+    print("e, d", e, d)
     num_cards = 52
-    alice_key = random.randint(1, 52)
 
     # Deck has numbers from 0 to 51
     deck = list(range(num_cards))
@@ -31,7 +35,7 @@ def main():
 
     # Deck encryption by Alice
     for i in range(num_cards):
-        deck[i] = encrypt_card(deck[i], alice_key)
+        deck[i] = encrypt_card(deck[i], e)
 
     # Shuffle deck
     random.shuffle(deck)
@@ -48,15 +52,21 @@ def main():
 
     # Decrypt deck before individual encryption
     for i in range(num_cards):
-        shuffled_deck_bob[i] = decrypt_card(shuffled_deck_bob[i], alice_key)
+        shuffled_deck_bob[i] = decrypt_card(shuffled_deck_bob[i], d)
+    print("shuffled_deck_bob", shuffled_deck_bob)
 
     print("Deck decrypted.\n")
-
+    alice_individual_keys_e = [0] * num_cards
+    alice_individual_keys_d = [0] * num_cards
+    print(alice_individual_keys_e)
     print("Getting individual keys...")
-    alice_individual_keys = random.sample(range(1, 60), num_cards)
+
+    for i in range(num_cards):
+        alice_individual_keys_e[i], alice_individual_keys_d[i] = generate_keys(PRIME, state)
+
     # Encrypt each card with its individual key
     for i in range(num_cards):
-        shuffled_deck_bob[i] = encrypt_card(shuffled_deck_bob[i], alice_individual_keys[i])
+        shuffled_deck_bob[i] = encrypt_card(shuffled_deck_bob[i], alice_individual_keys_e[i])
     print("Deck encrypted by individual keys.\n")
 
     # Send deck to Bob for individual encryption
@@ -78,11 +88,11 @@ def main():
     # Alice gets first two cards
     for i in range(2):
         alice_cards.append(shuffled_encrypted_cards[i])
-        alice_cards_keys1.append(alice_individual_keys[i])
+        alice_cards_keys1.append(alice_individual_keys_d[i])
 
     # Bob gets second two cards
     for i in range(2, 4):
-        bob_cards_keys2.append(alice_individual_keys[i])
+        bob_cards_keys2.append(alice_individual_keys_d[i])
 
     print("A hand of ", 2, " cards received.\n")
 
@@ -100,7 +110,8 @@ def main():
     print("Decrypting your cards...\n")
     alice_cards_decrypted = [0 for i in range(2)]
     for i in range(2):
-        alice_cards_decrypted[i] = decrypt_card(decrypt_card(alice_cards[i], alice_cards_keys1[i]), alice_cards_keys2[i])
+        alice_cards_decrypted[i] = decrypt_card(decrypt_card(alice_cards[i], alice_cards_keys1[i]),
+                                                alice_cards_keys2[i])
 
     print("Your cards are : ")
 
@@ -127,10 +138,11 @@ def main():
     table_cards_keys2 = connection_from_bob.recv(4096)
     table_cards_keys2 = pickle.loads(table_cards_keys2)
 
-     # Decrypt table cards
+    # Decrypt table cards
     table_cards = []
     for i in range(3):
-        table_cards.append(decrypt_card(decrypt_card(table_cards_encrypted[i], table_cards_keys1[i]), table_cards_keys2[i]))
+        table_cards.append(
+            decrypt_card(decrypt_card(table_cards_encrypted[i], table_cards_keys1[i]), table_cards_keys2[i]))
 
     print("Table are:")
     print_cards_in_lst(table_cards)
