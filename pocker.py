@@ -60,7 +60,7 @@ def check_straight(hand):
         value_counts[v] += 1
 
     value_range = max(values) - min(values)
-    if value_range == 4:
+    if value_range == 4 and len(set(value_counts.values())) == 1:
         return True, [max(values)], 0
 
     # check straight with low Ace
@@ -188,17 +188,11 @@ def choose_winner(left_hand, right_hand, table_cards):
                        "four of a kind",
                        "straight flush"]
 
-    print(f"Left guy has combination '{combination_lst[left_score - 1]}' with main cards:")
-    common.print_cards_in_lst(left_ans)
-    print(" and kickers ")
-    common.print_cards_in_lst(left_kickers)
-    print()
+    print(
+        f"Left guy has combination '{combination_lst[left_score - 1]}' with main card values: {left_ans} and kickers {left_kickers}\n")
 
-    print(f"Right guy has combination '{combination_lst[right_score - 1]}' with main cards:")
-    common.print_cards_in_lst(right_ans)
-    print(" and kickers ")
-    common.print_cards_in_lst(right_kickers)
-    print()
+    print(
+        f"Right guy has combination '{combination_lst[right_score - 1]}' with main card values: {right_ans} and kickers {right_kickers}\n")
 
     if left_score > right_score:
         return 1, 0
