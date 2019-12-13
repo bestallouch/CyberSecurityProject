@@ -40,7 +40,7 @@ def main():
         num_cards = 52
 
         # Deck has numbers from 0 to 51
-        deck = list(range(num_cards))
+        deck = list(range(2, num_cards + 2))
         print("A deck of ", num_cards, " cards received.")
 
         # Deck encryption by Alice

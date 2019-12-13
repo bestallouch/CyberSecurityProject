@@ -11,7 +11,7 @@ from pocker import *
 
 def main():
     # Alice's server for initial reshuffling
-    host_alice = '127.0.0.1'
+    host_alice = '192.168.31.160'
     port_alice = 5006
     client_alice = socket.socket()
     client_alice.connect((host_alice, port_alice))
