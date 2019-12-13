@@ -197,12 +197,13 @@ def choose_winner(left_hand, right_hand, table_cards):
                        "four of a kind",
                        "straight flush"]
 
-    print(f"Left guy has combination '{combination_lst[left_score - 1]}' with main card values:")
+    print("===================================================================================")
+    print(f"Alice has combination '{combination_lst[left_score - 1]}' with main card values:")
     common.print_cards_in_lst(left_cards)
     print("and kickers")
     common.print_cards_in_lst(left_kickers)
 
-    print(f"Right guy has combination '{combination_lst[right_score - 1]}' with main card values:")
+    print(f"Bob has combination '{combination_lst[right_score - 1]}' with main card values:")
     common.print_cards_in_lst(right_cards)
     print("and kickers")
     common.print_cards_in_lst(right_kickers)
