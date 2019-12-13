@@ -107,7 +107,7 @@ def check_two_pairs(hand):
     return False, [], 1
 
 
-def check_one_pairs(hand):
+def check_one_pair(hand):
     values = common.get_hand_values(hand)
     value_counts = defaultdict(lambda: 0)
     for v in values:
@@ -151,12 +151,11 @@ def check_hand(hand):
     if flag:
         return 3, ans, kickers_amount
 
-    flag, ans, kickers_amount = check_one_pairs(hand)
+    flag, ans, kickers_amount = check_one_pair(hand)
     if flag:
         return 2, ans, kickers_amount
 
     return 1, [], kickers_amount
-
 
 
 def get_hand_score(hand, table_cards):
@@ -184,6 +183,22 @@ def get_hand_score(hand, table_cards):
 def choose_winner(left_hand, right_hand, table_cards):
     left_score, left_ans, left_kickers = get_hand_score(left_hand, table_cards)
     right_score, right_ans, right_kickers = get_hand_score(right_hand, table_cards)
+
+    combination_lst = ["no combination", "one pair", "two pairs", "three of a kind", "straight", "flush", "full house",
+                       "four of a kind",
+                       "straight flush"]
+
+    print(f"Left guy has combination '{combination_lst[left_score]}' with main cards:")
+    common.print_cards_in_lst(left_ans)
+    print(" and kickers ")
+    common.print_cards_in_lst(left_kickers)
+    print()
+
+    print(f"Right guy has combination '{combination_lst[right_score]}' with main cards:")
+    common.print_cards_in_lst(right_ans)
+    print(" and kickers ")
+    common.print_cards_in_lst(right_kickers)
+    print()
 
     if left_score > right_score:
         return 1, 0
