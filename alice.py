@@ -47,7 +47,6 @@ def main():
         for i in range(num_cards):
             deck[i] = encrypt_card(deck[i], e)
 
-
         # Shuffle deck
         random.shuffle(deck)
         print("Deck encrypted and shuffled.\n")
@@ -164,7 +163,7 @@ def main():
         alice_bet = 50
         alice_money -= alice_bet
         all_alice_bet += alice_bet
-        print("You are the 1 player. Your bet is", alice_bet,"\n")
+        print("You are the 1 player. Your bet is", alice_bet, "\n")
         print("You have ", alice_money, "$")
 
         send_deck(connection_from_bob, address_bob, alice_bet)
@@ -183,7 +182,7 @@ def main():
             while (all_alice_bet != all_bob_bet or first_turn) and not isFold:
                 first_turn = False
                 print("Time to make a bet. Enter help for more information")
-                print("You: stack -", alice_money, ",", "pot -", all_alice_bet)
+                print("You: stack -", alice_money, ",", "pot -", bank, "your total bet -", all_alice_bet)
                 while True:
                     command = input()
                     print("\n")
@@ -211,7 +210,7 @@ def main():
                             send_deck(connection_from_bob, address_bob, command)
                             break
                         if command == "call":
-                            alice_bet = all_alice_bet - all_bob_bet
+                            alice_bet = all_bob_bet - all_alice_bet
                             alice_money -= alice_bet
                             all_alice_bet += alice_bet
                             bank += alice_bet
@@ -225,7 +224,7 @@ def main():
                     command = pickle.loads(command)
                     print("Opponent made a bet")
 
-                    if command == "fold":
+                    if "fold" in command:
                         alice_money += bank
                         bank = 0
                         print("You win. You have", alice_money, "$")
@@ -245,7 +244,7 @@ def main():
                         break
                     if "check" in command:
                         print("Opponent check")
-                    print("Opponent: stack -", bob_money,",", "pot -", all_bob_bet)
+                    print("Opponent: stack -", bob_money, ",", "pot -", bank, "opponent total bet -", all_bob_bet)
 
             if current_card_in_deck < 9 and not isFold:
                 # Open one more card
@@ -255,7 +254,9 @@ def main():
                 key_from_bob = connection_from_bob.recv(4096)
                 key_from_bob = pickle.loads(key_from_bob)
 
-                table_cards.append(decrypt_card(decrypt_card(shuffled_encrypted_cards[current_card_in_deck], key_from_bob), key_from_alice))
+                table_cards.append(
+                    decrypt_card(decrypt_card(shuffled_encrypted_cards[current_card_in_deck], key_from_bob),
+                                 key_from_alice))
                 print("Table are:")
                 print_cards_in_lst(table_cards)
                 print("\n")
@@ -269,7 +270,9 @@ def main():
 
             bob_cards = []
             for i in range(2):
-                bob_cards.append(decrypt_card(decrypt_card(shuffled_encrypted_cards[i + 2], alice_individual_keys[i + 2]), bob_cards_keys[i]))
+                bob_cards.append(
+                    decrypt_card(decrypt_card(shuffled_encrypted_cards[i + 2], alice_individual_keys[i + 2]),
+                                 bob_cards_keys[i]))
 
             print("Table are:")
             print_cards_in_lst(table_cards)
