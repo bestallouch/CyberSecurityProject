@@ -14,7 +14,7 @@ from pocker import *
 def main():
     # Alice's server for initial reshuffling
     # Set up server to connect to Bob
-    server_alice = set_server('127.0.0.1', 5006, 2)
+    server_alice = set_server(input(), 5006, 2)
 
     print("Alice is up for the game.")
     print("Waiting for Bob to connect...\n")

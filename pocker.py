@@ -92,7 +92,7 @@ def check_two_pairs(hand):
     for v in values:
         value_counts[v] += 1
 
-    if set(value_counts.values()) == {1, 2, 2}:
+    if sorted(value_counts.values()) == [1, 2, 2]:
         pair1 = 0
         pair2 = 0
 
@@ -188,13 +188,13 @@ def choose_winner(left_hand, right_hand, table_cards):
                        "four of a kind",
                        "straight flush"]
 
-    print(f"Left guy has combination '{combination_lst[left_score]}' with main cards:")
+    print(f"Left guy has combination '{combination_lst[left_score - 1]}' with main cards:")
     common.print_cards_in_lst(left_ans)
     print(" and kickers ")
     common.print_cards_in_lst(left_kickers)
     print()
 
-    print(f"Right guy has combination '{combination_lst[right_score]}' with main cards:")
+    print(f"Right guy has combination '{combination_lst[right_score - 1]}' with main cards:")
     common.print_cards_in_lst(right_ans)
     print(" and kickers ")
     common.print_cards_in_lst(right_kickers)
@@ -221,11 +221,11 @@ def choose_winner(left_hand, right_hand, table_cards):
 
 
 if __name__ == '__main__':
-    left_hand = [5, 6]
-    right_hand = [10, 11]
-    table = [1, 34, 8, 4, 3]
-    common.print_cards_in_lst(table)
+    left_hand = [53, 49]
+    right_hand = [26, 50]
+    table = [16, 20, 32, 40, 21]
     common.print_cards_in_lst(left_hand)
     common.print_cards_in_lst(right_hand)
+    common.print_cards_in_lst(table)
 
     print(choose_winner(left_hand, right_hand, table))
