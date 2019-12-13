@@ -162,11 +162,14 @@ def main():
         print("You have ", bob_money, "$")
 
         current_card_in_deck = 7
-        isFold = False
+
+
         data = pickle.dumps(bob_bet, -1)
         client_alice.sendall(data)
         while current_card_in_deck < 10 and not isFold:
             first_turn = True
+            isFold = False
+            is_call = False
             while (all_alice_bet != all_bob_bet or first_turn) and not isFold:
                 # Get Alice bet
                 print("Wait for your opponent")
@@ -191,11 +194,12 @@ def main():
 
                     all_alice_bet += alice_bet
                     bank += alice_bet
+                    is_call = True
                     print("Opponent CALLED on", alice_bet)
                 if "check" in command:
                     print("Opponent CHECK")
 
-                if not isFold:
+                if not isFold and not is_call:
                     first_turn = False
                     print("Opponent: stack -", alice_money, ",", "pot -", bank, "opponent total bet -", all_alice_bet)
                     print("Time to make a bet. Enter help for more information")

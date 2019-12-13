@@ -175,11 +175,12 @@ def main():
         bank += bob_bet
 
         current_card_in_deck = 7
-        isFold = False
-        is_call = False
+
+
         # Time to make a bet
         while current_card_in_deck < 10 and not isFold:
-            first_turn = True
+            is_call = False
+            isFold = False
             while (all_alice_bet != all_bob_bet or first_turn) and not isFold:
                 first_turn = False
                 print("Time to make a bet. Enter help for more information")
@@ -196,7 +197,6 @@ def main():
                         if command == "fold":
                             bob_money += bank
                             bank = 0
-
                             send_deck(connection_from_bob, address_bob, command)
                             print("You lose. You have", alice_money, "$")
                             isFold = True
@@ -204,57 +204,55 @@ def main():
                         if command == "check":
                             send_deck(connection_from_bob, address_bob, command)
                             break
-
                         if "raise" in command:
                             alice_bet = int(command.strip().split()[1])
                             alice_money -= alice_bet
                             all_alice_bet += alice_bet
                             bank += alice_bet
-
                             send_deck(connection_from_bob, address_bob, command)
                             break
                         if command == "call":
                             alice_bet = all_bob_bet - all_alice_bet
                             alice_money -= alice_bet
-
                             all_alice_bet += alice_bet
                             bank += alice_bet
                             is_call = True
                             send_deck(connection_from_bob, address_bob, command)
                             break
 
-                if not isFold and not is_call:
-                    # Get Bob bet
-                    print("Waiting for your opponent")
-                    command = connection_from_bob.recv(4096)
-                    command = pickle.loads(command)
+                if not first_turn and not is_call:
+                    if not isFold:
+                        # Get Bob bet
+                        print("Waiting for your opponent")
+                        command = connection_from_bob.recv(4096)
+                        command = pickle.loads(command)
 
-                    if "fold" in command:
-                        alice_money += bank
-                        bank = 0
-                        print("You win. You have", alice_money, "$")
-                        isFold = True
-                        break
-                    if "raise" in command:
-                        bob_bet = int(command.split()[1])
-                        bob_money -= bob_bet
-
-                        all_bob_bet += bob_bet
-                        bank += bob_bet
-                        print("Opponent RAISED on", bob_bet)
-                    if "call" in command:
-                        bob_bet = all_alice_bet - all_bob_bet
-                        bob_money -= bob_bet
-                        all_bob_bet += bob_bet
-                        bank += bob_bet
-                        print("Opponent CALLED on", bob_bet)
-                        break
-                    if "check" in command:
-                        print("Opponent CHECKED")
-                    print("Opponent: stack -", bob_money, ",", "pot -", bank, "opponent total bet -", all_bob_bet)
+                        if "fold" in command:
+                            alice_money += bank
+                            bank = 0
+                            print("You win. You have", alice_money, "$")
+                            isFold = True
+                            break
+                        if "raise" in command:
+                            bob_bet = int(command.split()[1])
+                            bob_money -= bob_bet
+                            all_bob_bet += bob_bet
+                            bank += bob_bet
+                            print("Opponent RAISED on", bob_bet)
+                        if "call" in command:
+                            bob_bet = all_alice_bet - all_bob_bet
+                            bob_money -= bob_bet
+                            all_bob_bet += bob_bet
+                            bank += bob_bet
+                            print("Opponent CALLED on", bob_bet)
+                            break
+                        if "check" in command:
+                            print("Opponent CHECKED")
+                        print("Opponent: stack -", bob_money, ",", "pot -", bank, "opponent total bet -", all_bob_bet)
 
             if current_card_in_deck < 9 and not isFold:
                 # Open one more card
+                first_turn = True
                 key_from_alice = alice_individual_keys[current_card_in_deck]
                 send_deck(connection_from_bob, address_bob, key_from_alice)
 
