@@ -237,13 +237,13 @@ def main():
                         bob_money -= bob_bet
                         all_bob_bet += bob_bet
                         bank += bob_bet
-                        print("Opponent raise on", alice_bet)
+                        print("Opponent raise on", bob_bet)
                     if "call" in command:
                         bob_bet = all_alice_bet - all_bob_bet
                         bob_money -= bob_bet
                         all_bob_bet += bob_bet
                         bank += bob_bet
-                        print("Opponent call on", alice_bet)
+                        print("Opponent call on", bob_bet)
                         break
                     if "check" in command:
                         print("Opponent check")
