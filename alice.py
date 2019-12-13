@@ -175,7 +175,7 @@ def main():
         bank += bob_bet
 
         current_card_in_deck = 7
-
+        isFold = False
 
         # Time to make a bet
         while current_card_in_deck < 10 and not isFold:
